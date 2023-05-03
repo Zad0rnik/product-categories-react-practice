@@ -24,10 +24,11 @@ export const App = () => {
   const filteredProducts = products.filter((product) => {
     const formattedQuery = query.toLowerCase();
     const formattedName = product.name.toLowerCase();
+    const categoryToShow = selectCategory.includes(product.category.title);
 
     return formattedName.includes(formattedQuery)
       && (product.user.id === selectedUser || selectedUser === 'All')
-      && (product.category.id === selectCategory || selectCategory === 'All');
+      && (categoryToShow || selectCategory === 'All');
   });
 
   const [visibleProducts, setVisibleProducts] = useState(filteredProducts);
@@ -37,7 +38,7 @@ export const App = () => {
 
   useEffect(() => {
     setVisibleProducts(filteredProducts);
-  }, [selectedUser, query]);
+  }, [selectedUser, query, selectCategory]);
 
   return (
     <div className="section">
@@ -115,9 +116,8 @@ export const App = () => {
               <a
                 href="#/"
                 data-cy="AllCategories"
-                className={classNames('button mr-2 my-1', {
-                  'is-info': selectCategory === 'All',
-                })}
+                className={classNames('button is-success mr-6',
+                  { 'is-outlined': selectCategory.length !== 0 })}
                 onClick={() => {
                   setSelectedCategory('All');
                 }}
@@ -131,10 +131,25 @@ export const App = () => {
                   data-cy="Category"
                   href="#/"
                   className={classNames('button mr-2 my-1', {
-                    'is-info': selectCategory === category.id,
+                    'is-info': selectCategory.includes(category.title),
                   })}
                   onClick={() => {
-                    setSelectedCategory(category.id);
+                    setSelectedCategory(
+                      (prevFilters) => {
+                        const copyOfPrev = [...prevFilters];
+
+                        if (!copyOfPrev.includes(category.title)) {
+                          copyOfPrev.push(category.title);
+                        } else {
+                          const indexToDel = copyOfPrev
+                            .indexOf(category.title);
+
+                          copyOfPrev.splice(indexToDel, 1);
+                        }
+
+                        return copyOfPrev;
+                      },
+                    );
                   }}
                 >
                   {category.title}
@@ -150,6 +165,7 @@ export const App = () => {
                 onClick={() => {
                   setQuery('');
                   setSelectedUser('All');
+                  setSelectedCategory('All');
                 }}
               >
                 Reset all filters
