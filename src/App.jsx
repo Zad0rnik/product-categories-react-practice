@@ -19,7 +19,7 @@ const products = productsFromServer.map((product) => {
 export const App = () => {
   const [selectedUser, setSelectedUser] = useState('All');
   const [query, setQuery] = useState('');
-  const [selectCategory, setSelectedCategory] = useState('All');
+  const [selectCategory, setSelectedCategory] = useState([]);
 
   const filteredProducts = products.filter((product) => {
     const formattedQuery = query.toLowerCase();
@@ -28,7 +28,7 @@ export const App = () => {
 
     return formattedName.includes(formattedQuery)
       && (product.user.id === selectedUser || selectedUser === 'All')
-      && (categoryToShow || selectCategory === 'All');
+      && (categoryToShow || selectCategory.length === 0);
   });
 
   const [visibleProducts, setVisibleProducts] = useState(filteredProducts);
@@ -119,7 +119,7 @@ export const App = () => {
                 className={classNames('button is-success mr-6',
                   { 'is-outlined': selectCategory.length !== 0 })}
                 onClick={() => {
-                  setSelectedCategory('All');
+                  setSelectedCategory([]);
                 }}
               >
                 All
@@ -165,7 +165,7 @@ export const App = () => {
                 onClick={() => {
                   setQuery('');
                   setSelectedUser('All');
-                  setSelectedCategory('All');
+                  setSelectedCategory([]);
                 }}
               >
                 Reset all filters
